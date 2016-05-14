@@ -1,0 +1,57 @@
+# First do a fresh install of CentOS 5.7 i386, server configuration (no GUI)
+# This should be performed as root since it's going to be installing a bunch of stuff
+
+# --- Update things to make sure we have the latest patches ---
+# Add EPEL so we can get reasonably recent packages
+rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+
+# --- Install all the packages --- #
+yum -y install python-whisper python-carbon graphite-web python-memcached python-ldap httpd memcached
+
+# ===== BEGIN MANUAL STEP =====
+# run syncdb to setup the db and prime the authentication model (if you're using the DB model)
+python /usr/lib/python2.6/site-packages/graphite/manage.py syncdb
+# ===== END MANUAL STEP =====
+
+# --- Allow HTTP through firewall --- #
+iptables -I INPUT 5 -m state --state NEW -p tcp --dport 80 -j ACCEPT
+iptables-save > /etc/sysconfig/iptables
+
+service carbon-cache restart
+service memcached restart
+service httpd restart
+
+
+# === Below needs to be re-validated for 6.4 === #
+
+
+# --- Install git ---
+yum install -y gcc zlib-devel curl curl-devel openssl
+wget http://kernel.org/pub/software/scm/git/git-1.7.4.2.tar.bz2
+tar xjf git-1.7.4.2.tar.bz2
+pushd git-1.7.4.2
+./configure && make && make install
+popd
+rm -rf git*
+
+# --- Install NodeJS ---
+yum install -y gcc-c++
+git clone https://github.com/joyent/node.git
+pushd node
+./configure && make && make install
+popd
+rm -rf node
+
+# --- Install the Node Package Manager ---
+curl http://npmjs.org/install.sh | sh
+npm install express
+
+# --- Install StatsD ---
+git clone https://github.com/etsy/statsd.git
+cd statsd
+# copy the the statsd config example to create the config file
+# unless you used non-default ports for some other feature of the system, the defaults in the config file are fine
+cp exampleConfig.js local.js
+# --- Start StatsD ---
+node stats.js local.js
+

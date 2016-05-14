@@ -1,0 +1,21 @@
+perl: warning: Falling back to the standard locale ("C").
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings
+
+export LC_CTYPE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+Openssl compile:
+
+Remove openssl-devel
+
+./config --prefix=/usr/local shared
+make
+make install
+cp pkg-config files to /usr/lib64/pkgconfig
+
+Apache compile:
+
+./configure --enable-so --enable-mods-shared="all ssl ldap cache proxy authn_alias file_cache authnz_ldap charset_lite dav_lock cache_disk"
+
+LDFLAGS=-L/usr/local/lib64 CPPFLAGS=-I/usr/local/include ./configure --enable-so --enable-mods-shared="all ssl authn_alias charset_lite" --with-ssl=/usr/local

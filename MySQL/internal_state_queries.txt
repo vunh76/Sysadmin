@@ -1,0 +1,9 @@
+select page_type as Page_Type, sum(data_size)/1024/1024 as Size_in_MB from information_schema.innodb_buffer_page group by page_type order by Size_in_MB desc;
+
+select table_name as Table_Name, index_name as Index_Name, count(*) as Page_Count, sum(data_size)/1024/1024 as Size_in_MB from information_schema.innodb_buffer_page group by table_name, index_name order by Size_in_MB desc;
+
+SELECT page_state, COUNT(page_state) FROM innodb_buffer_page GROUP BY page_state;
+
+SELECT CEILING(Total_InnoDB_Bytes*1.6/POWER(1024,3)) RIBPS FROM (SELECT SUM(data_length+index_length) Total_InnoDB_Bytes FROM information_schema.tables WHERE engine='InnoDB') A;
+
+select table_schema, table_name, round(data_length/1024/1024,2) as size_mb from information_schema.tables where table_schema like 'my_database' order by size_mb desc;

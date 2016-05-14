@@ -1,0 +1,9 @@
+//normal account
+create user 'user'@'localhost' identified by '123456';
+grant all privileges on *.* to 'user'@'localhost';
+flush privileges;
+
+//replication account
+CREATE USER 'repl'@'%' IDENTIFIED BY 'password';
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+CHANGE MASTER TO MASTER_HOST='10.0.1.5', MASTER_USER='repl', MASTER_PASSWORD='password', MASTER_LOG_FILE='mysql-bin.000002', MASTER_LOG_POS=411;
