@@ -7,3 +7,7 @@ SELECT page_state, COUNT(page_state) FROM innodb_buffer_page GROUP BY page_state
 SELECT CEILING(Total_InnoDB_Bytes*1.6/POWER(1024,3)) RIBPS FROM (SELECT SUM(data_length+index_length) Total_InnoDB_Bytes FROM information_schema.tables WHERE engine='InnoDB') A;
 
 select table_schema, table_name, round(data_length/1024/1024,2) as size_mb from information_schema.tables where table_schema like 'my_database' order by size_mb desc;
+
+SELECT table_name, concat( round( data_length / ( 1024 *1024 ) , 2 ) , 'Mb' ) AS 'data_length_mb', concat( round( index_length / ( 1024 *1024 ) , 2 ) , 'Mb' ) AS 'index_length_mb', concat( round( round( data_length + index_length ) / ( 1024 *1024 ) , 2 ) , 'Mb' )  AS 'total_size_mb' FROM information_schema.tables WHERE table_schema ='my_database' ORDER BY data_length desc;
+
+SELECT SUM(index_length) / ( 1024 *1024 ) AS 'index_length', SUM(data_length) / ( 1024 *1024 ) AS 'data_length' FROM information_schema.tables WHERE table_schema ='my_database';
